@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capacitaciones</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f4f6f9;
+      padding: 30px 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+
+    #lista-capacitaciones {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .card .id {
+      display: inline-block;
+      background: #3498db;
+      color: #fff;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .mensaje {
+      text-align: center;
+      font-size: 16px;
+      color: #777;
+      margin-top: 40px;
+    }
+
+    .error {
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Listado de Capacitaciones</h1>
+  <div id="lista-capacitaciones">
+    <p class="mensaje">Cargando datos...</p>
+  </div>
+
+  <script>
+    // Configuración de la API
+    const API_URL = 'https://waiumpzeazqjiltoslod.supabase.co/rest/v1/capacitaciones?select=*';
+    const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhaXVtcHplYXpxamlsdG9zbG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MzMxMzEsImV4cCI6MjEwNjIwOTEzMX0.FvPpHSydsyrGTClOfyiuoxChYTfaWZ2X-WKzhdTpj74';
+
+    // Función para obtener los datos
+    async function obtenerCapacitaciones() {
+      const contenedor = document.getElementById('lista-capacitaciones');
+
+      try {
+        const respuesta = await fetch(API_URL, {
+          method: 'GET',
+          headers: {
+            'apikey': API_KEY,
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!respuesta.ok) {
+          throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+
+        const datos = await respuesta.json();
+        console.log('Datos recibidos:', datos);
+
+        // Limpiamos el contenedor
+        contenedor.innerHTML = '';
+
+        if (!Array.isArray(datos) || datos.length === 0) {
+          contenedor.innerHTML = '<p class="mensaje">No hay capacitaciones disponibles.</p>';
+          return;
+        }
+
+        // Renderizamos cada capacitación
+        datos.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <span class="id">ID: ${item.id ?? 'N/A'}</span>
+            <h2>${item.titulo ?? 'Sin título'}</h2>
+            <p>${item.descripcion ?? 'Sin descripción'}</p>
+          `;
+          contenedor.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error('Error al consumir la API:', error);
+        contenedor.innerHTML = `<p class="mensaje error">Error al cargar los datos: ${error.message}</p>`;
+      }
+    }
+
+    // Ejecutamos al cargar la página
+    document.addEventListener('DOMContentLoaded', obtenerCapacitaciones);
+  </script>
+
+</body>
+</html>
